@@ -1,0 +1,13 @@
+* ビルド方法
+
+#+BEGIN_EXAMPLE
+cargo install vcpkg
+cargo vcpkg build
+cargo run --release
+cargo build --release
+#+END_EXAMPLE
+
+* 参考
+
+LinuxとWindowsでビルドできるRust-SDL2プロジェクトを作成する
+https://www.xmisao.com/2021/01/11/setup-cross-platform-rust-sdl2-project.html
