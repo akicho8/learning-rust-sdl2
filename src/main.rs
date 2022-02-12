@@ -4,7 +4,7 @@ const VIEW_SIZE_RATE: f32  = 0.95;    // 画面に対する表示領域の大き
 const COLOR_MAX: i32       = 255;     // 色の要素の最大
 const FPS: u32             = 60;      // 決め打ち
 
-//   PresetList = [
+//   PRESET_LIST = [
 //     { favorite: false, name: "default",                                              func: -> (t, i, x, y) { sin(y/8+t)                                                     }},
 //     { favorite: false, name: "for every dot return 0 or 1 to change the visibility", func: -> (t, i, x, y) { rand < 0.1                                                     }},
 //     { favorite: false, name: "use a float between 0 and 1 to define the size",       func: -> (t, i, x, y) { rand                                                           }},
@@ -52,35 +52,11 @@ const FPS: u32             = 60;      // 決め打ち
 //     { favorite: false, name: "disco",                                                func: -> (t, i, x, y) { sin(t*5) * tan(t*7)                                            }},
 //     { favorite: false, name: "input is limited to 32 characters!",                   func: -> (t, i, x, y) { (x-5)**2 + (y-5)**2 - 99*sin(t)                                }},
 //   ]
-//
+
 //   def initialize
 //     @preset_index = 0
 //     @counter      = 0
 //   end
-//
-//   def run
-//     SDL2.init(SDL2::INIT_EVERYTHING)
-//
-//     @window = SDL2::Window.create("(WindowTitle)", SDL2::Window::POS_CENTERED, SDL2::Window::POS_CENTERED, 640, 480, 0)
-//     @renderer = @window.create_renderer(-1, SDL2::Renderer::Flags::PRESENTVSYNC)
-//     @srect = Vec2[*@window.size]
-//
-//     setup_vars
-//
-//     @real_fps = FPS
-//     fps_counter = 0
-//     old_time = SDL2.get_ticks
-//
-//     loop do
-//       while ev = SDL2::Event.poll
-//         case ev
-//         when SDL2::Event::KeyDown
-//           if ev.scancode == SDL2::Key::Scan::ESCAPE
-//             exit
-//           end
-//           if ev.scancode == SDL2::Key::Scan::Q
-//             exit
-//           end
 //           if ev.scancode == SDL2::Key::Scan::Z
 //             preset_change(1)
 //           end
@@ -89,66 +65,39 @@ const FPS: u32             = 60;      // 決め打ち
 //           end
 //         end
 //       end
-//
-//       @renderer.draw_color = [0, 0, 0]
-//       @renderer.clear
-//
-//       if false
-//         # https://ohai.github.io/ruby-sdl2/doc-en/SDL2/Mouse.html
-//         @local_state = SDL2::Mouse.state
-//         @renderer.draw_color = [0, 0, 255]
-//         rect = SDL2::Rect.new(@local_state.x, @local_state.y, 32, 32)
-//         @renderer.fill_rect(rect)
-//       end
-//
-//       time = @counter.fdiv(FPS)
-//       index = 0
-//       SIDE_SIZE.times do |y|
-//         SIDE_SIZE.times do |x|
-//           retval = func_call(time, index, x, y)
-//           if retval.kind_of?(Numeric)
-//             if retval.nonzero?
-//               retval = retval.clamp(-1.0, 1.0)
-//               v = @top_left + @cell_wh.map2([x, y]) { |a, b| a * b } # それぞれに乗算するため scale ではだめ
-//               radius = @half_cell_wh * value_to_radius_rate(retval)  # 楕円の半径 = 最大半径 * 割合
-//               center = v + @half_cell_wh                             # セルの中心
-//               v2 = center - radius                                   # 長方形の左上
-//               @renderer.draw_color = value_to_color(retval)
-//               @renderer.fill_rect(SDL2::Rect.new(*v2, *(radius*2)))  # v2 から [radius, radius] の長方形を描画
-//             end
-//           end
-//           index += 1
-//         end
-//       end
-//
-//       @counter += 1
-//
-//       fps_counter += 1
-//       v = SDL2.get_ticks
-//       t = v - old_time
-//       if t >= 1000
-//         @real_fps = fps_counter
-//         puts "#{@real_fps} FPS"
-//         old_time = v
-//         fps_counter = 0
-//       end
-//
-//       @renderer.present
-//     end
-//   end
-//
 
-// fn func_call(t, i, x, y)
-//     if e = current_preset
-//       v = instance_exec(t, Float(i), Float(x), Float(y), &e[:func])
-//       if v == true
-//         v = 1.0
-//       elsif v == false || v.nil?
-//         v = 0.0
-//       end
-//       v
-//     end
-//   end
+fn my_sin(v: f32) -> f32 {
+    v.sin()
+}
+
+fn my_rand() -> f32 {
+    rand::thread_rng().gen_range(0.0, 1.0)
+}
+
+type MyFuncType = fn(f32, f32, f32, f32) -> f32;
+
+// fn func_call(t: f32, i: f32, x: f32, y: f32) -> f32 {
+//     let _ = t;
+//     let _ = i;
+//     let _ = x;
+//     let _ = y;
+//
+//     // PRESET_LIST.0(t, i, x, y)
+//
+//     // // rand::thread_rng().gen_range(-1.0, 1.0)
+//     // t.sin()
+//
+//     // if e = current_preset
+//     //     v = instance_exec(t, Float(i), Float(x), Float(y), &e[:func])
+//     //     if v == true
+//     //     v = 1.0
+//     //     elsif v == false || v.nil?
+//     //     v = 0.0
+//     //     end
+//     //     v
+//     //     end
+//     //     end
+// }
 
 //
 //   def current_preset
@@ -156,8 +105,8 @@ const FPS: u32             = 60;      // 決め打ち
 //   end
 //
 //   def filtered_preset_list
-//     # @filtered_preset_list ||= PresetList.find_all { |e| e[:favorite] }
-//     @filtered_preset_list ||= PresetList
+//     # @filtered_preset_list ||= PRESET_LIST.find_all { |e| e[:favorite] }
+//     @filtered_preset_list ||= PRESET_LIST
 //   end
 //
 //   def counter_reset
@@ -216,6 +165,8 @@ struct Application {
     cell_wh: Vec2,
     half_cell_wh: Vec2,
     top_left: Vec2,
+    counter: usize,
+    preset_index: isize,
 }
 
 impl Application {
@@ -223,6 +174,14 @@ impl Application {
         self.cell_wh      = self.srect.scale((1.0 / SIDE_SIZE) * VIEW_SIZE_RATE);            // 画面の大きさから1つのセルのサイズを求める
         self.half_cell_wh = self.cell_wh.scale(0.5);                                         // 扱いやすいように半分バージョンも作っておく
         self.top_left     = self.srect.scale(0.5).sub(&self.cell_wh.scale(SIDE_SIZE * 0.5)); // 左上
+    }
+
+    fn time(&self) -> f32 {
+        self.counter as f32 / FPS as f32
+    }
+
+    fn preset_change(&mut self, sign: isize) {
+        self.preset_index += sign
     }
 }
 
@@ -255,6 +214,11 @@ pub fn main() {
     };
     app.setup_vars();
 
+    let preset_list = [
+        |t:f32, i:f32, x:f32, y:f32| { my_sin(t) },
+        |t:f32, i:f32, x:f32, y:f32| { my_rand() },
+    ];
+
     let mut event_pump = sdl_context.event_pump().unwrap();
     // let mut i = 0;
     'running: loop {
@@ -274,6 +238,12 @@ pub fn main() {
                 Event::KeyDown { keycode: Some(Keycode::Q), .. } => {
                     break 'running
                 },
+                Event::KeyDown { keycode: Some(Keycode::Z), .. } => {
+                    app.preset_change(1)
+                },
+                Event::KeyDown { keycode: Some(Keycode::X), .. } => {
+                    app.preset_change(-1)
+                },
                 _ => {},
             }
         }
@@ -286,7 +256,17 @@ pub fn main() {
         let mut index = 0;
         for y in 0..SIDE_SIZE as usize {
             for x in 0..SIDE_SIZE as usize {
-                let mut retval = rand::thread_rng().gen_range(-1.0, 1.0);
+                let x = x as f32;
+                let y = y as f32;
+
+                // let mut retval = rand::thread_rng().gen_range(-1.0, 1.0);
+
+                // println!("{:?}", app.time());
+
+                // let mut retval = func_call(app.time(), index as f32, x as f32, y as f32);
+                let idx = app.preset_index as usize % preset_list.len();
+                let func = preset_list[idx as usize];
+                let mut retval = func(app.time(), index as f32, x, y);
 
                 if retval != 0.0 {
                     if retval < -1.0 {
@@ -296,7 +276,7 @@ pub fn main() {
                         retval = 1.0
                     }
                     // let v = @top_left + @cell_wh.map2([x, y]) { |a, b| a * b }
-                    let v = Vec2 { x: app.cell_wh.x * x as f32, y: app.cell_wh.y * y as f32 };
+                    let v = Vec2 { x: app.cell_wh.x * x, y: app.cell_wh.y * y };
                     let v = app.top_left.add(&v);
 
                     let radius = app.half_cell_wh.scale(value_to_radius_rate(retval));  // 楕円の半径 = 最大半径 * 割合
@@ -315,6 +295,7 @@ pub fn main() {
             }
         }
 
+        app.counter += 1;
         canvas.present();
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / FPS));
     }
