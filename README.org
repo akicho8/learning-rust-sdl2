@@ -1,13 +1,11 @@
-* ビルド方法
+* Tixy Rust clone using SDL2
 
-#+BEGIN_EXAMPLE
+  Original: https://tixy.land/
+
+  [[https://raw.github.com/akicho8/tixy_rust_clone_using_sdl2/master/image.png]]
+
+#+BEGIN_SRC shell
 cargo install vcpkg
 cargo vcpkg build
-cargo run --release
-cargo build --release
-#+END_EXAMPLE
-
-* 参照
-
-  LinuxとWindowsでビルドできるRust-SDL2プロジェクトを作成する
-  https://www.xmisao.com/2021/01/11/setup-cross-platform-rust-sdl2-project.html
+cargo run
+#+END_SRC
